@@ -1,19 +1,29 @@
 {
-  "name": "shopify-api-test",
+  "name": "Shopify-api-test",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "nodemon app.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mugil-Pandian-Eunimart/Shopify-api-test.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Mugil-Pandian-Eunimart/Shopify-api-test/issues"
+  },
+  "homepage": "https://github.com/Mugil-Pandian-Eunimart/Shopify-api-test#readme",
   "dependencies": {
+    "axios": "^0.21.1",
     "cookie": "^0.4.1",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
-    "express-session": "^1.17.2",
-    "nonce": "^1.0.4",
-    "querystring": "^0.2.1",
-    "request-promise": "^4.2.6"
+    "nodemon": "^2.0.12",
+    "nonce": "^1.0.4"
   }
 }
