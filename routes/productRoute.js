@@ -29,34 +29,45 @@ router.route('/shopify/callback').get( async (req, res) => {
     const hash = Product.generateEncryptedHash(queryParams)
     if (hash !== hmac) { return res.status(400).send('HMAC validation failed')}
     try {
-      const data = {
-        client_id: shopifyApiPublicKey,
-        client_secret: shopifyApiSecretKey,
-        code
-      };
-      const tokenResponse = await Product.fetchAccessToken(shop, data)
-      const { access_token } = tokenResponse.data
-      process.env.SHOPIFY_ACCESS_TOKEN = access_token
-      // const shopData = await fetchShopData(shop, access_token)
-    //   const addProductData = await Product.addProduct(shop, access_token)
-      const productData = await Product.fetchProducts(shop, access_token)
-      res.send(productData.data)
+        const data = {
+            client_id: shopifyApiPublicKey,
+            client_secret: shopifyApiSecretKey,
+            code
+        };
+        const tokenResponse = await Product.fetchAccessToken(shop, data)
+        const { access_token } = tokenResponse.data
+        process.env.SHOPIFY_ACCESS_TOKEN = access_token
+        const shopData = await Product.fetchShopData(shop, access_token)
+        res.send(shopData.data)
     } catch(err) {
-      console.log(err)
-      res.status(500).send('something went wrong')
+        console.log(err)
+        res.status(500).send("Error: "+err)
     }
 });
 
 router.route('/products').get( async (req,res) => {
     try{
         const shop = req.query.shop;
-        const shopData = await Product.fetchShopData(shop, process.env.SHOPIFY_ACCESS_TOKEN)
-        res.send(shopData.data)
+        const productData = await Product.fetchProducts(shop, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log("Fetched all Products")
+        res.send(productData.data)
     }
     catch(err) {
         console.log(err)
-        res.status(500).send('something went wrong')
+        res.status(500).send("Error: "+err)
     }
 })
+.post(async (req,res) => {
+    try {
+        const shop = req.query.shop;
+        const addProductData = await Product.addProduct(shop, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log("Added Product")
+        res.status(200).send({"data":"Product added Successfully"})
+        res.send(shopData.data)
+    } catch (err) {
+        console.log(err)
+        res.status(500).send("Error: "+err)
+    }
+});
 
 module.exports = router;
