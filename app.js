@@ -1,107 +1,56 @@
-///////////// Initial Setup /////////////
-
-const dotenv = require('dotenv').config();
 const express = require('express');
-const crypto = require('crypto');
-const cookie = require('cookie');
-const nonce = require('nonce')();
-const querystring = require('querystring');
-const axios = require('axios');
-
-const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
-const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
-const scopes = "read_products, write_products,read_product_listings,read_customers, write_customers,read_orders, write_orders";
-const appUrl = 'http://0794979b92c9.ngrok.io';
-
+const ProductRoute = require('./routes/productRoute')
+const dotenv = require('dotenv').config();
 const app = express();
 const PORT = 8080
 
-app.get('/', (req, res) => {
-  res.send('Ello Govna')
-});
+// app.get('/shopify', (req, res) => {
+//   const shop = req.query.shop;
 
-///////////// Helper Functions /////////////
+//   if (!shop) { return res.status(400).send('no shop')}
 
-const buildRedirectUri = () => `${appUrl}/shopify/callback`;
+//   const state = nonce();
 
-const buildInstallUrl = (shop, state, redirectUri) => `https://${shop}/admin/oauth/authorize?client_id=${shopifyApiPublicKey}&scope=${scopes}&state=${state}&redirect_uri=${redirectUri}`;
+//   const installShopUrl = Product.buildInstallUrl(shop, state, Product.buildRedirectUri())
 
-const buildAccessTokenRequestUrl = (shop) => `https://${shop}/admin/oauth/access_token`;
+//   res.cookie('state', state) // should be encrypted in production
+//   res.redirect(installShopUrl);
+// });
 
-const buildShopDataRequestUrl = (shop) => `https://${shop}/admin/shop.json`;
+// app.get('/shopify/callback', async (req, res) => {
+//   const { shop, code, state } = req.query;
+//   const stateCookie = cookie.parse(req.headers.cookie).state;
 
-const buildProductDataRequestUrl = (shop) => `https://${shop}/admin/api/2021-07/products.json`;
+//   if (state !== stateCookie) { return res.status(403).send('Cannot be verified')}
 
-const generateEncryptedHash = (params) => crypto.createHmac('sha256', shopifyApiSecretKey).update(params).digest('hex');
+//   const { hmac, ...params } = req.query
+//   const queryParams = querystring.stringify(params)
+//   const hash = Product.generateEncryptedHash(queryParams)
 
-const fetchAccessToken = async (shop, data) => await axios(buildAccessTokenRequestUrl(shop), {
-  method: 'POST',
-  data
-});
+//   if (hash !== hmac) { return res.status(400).send('HMAC validation failed')}
 
-const fetchShopData = async (shop, accessToken) => await axios(buildShopDataRequestUrl(shop), {
-  method: 'GET',
-  headers: {
-    'X-Shopify-Access-Token': accessToken
-  }
-});
+//   try {
+//     const data = {
+//       client_id: shopifyApiPublicKey,
+//       client_secret: shopifyApiSecretKey,
+//       code
+//     };
+//     const tokenResponse = await Product.fetchAccessToken(shop, data)
 
-const fetchProducts = async (shop, accessToken) => await axios(buildProductDataRequestUrl(shop), {
-    method: 'GET',
-    headers: {
-        'Content-Type': 'application/json' ,
-        'X-Shopify-Access-Token': accessToken
-    }
-  });
+//     const { access_token } = tokenResponse.data
+//     acc=access_token
+//     // const shopData = await fetchShopData(shop, access_token)
+//     const addProductData = await Product.addProduct(shop, access_token)
+//     const productData = await Product.fetchProducts(shop, access_token)
+//     // const saveData = JSON.parse(shopData.data.shop)
+//     // console.log(saveData)
+//     res.send(productData.data)
 
-///////////// Route Handlers /////////////
+//   } catch(err) {
+//     console.log(err)
+//     res.status(500).send('something went wrong')
+//   }
+// });
 
-app.get('/shopify', (req, res) => {
-  const shop = req.query.shop;
-
-  if (!shop) { return res.status(400).send('no shop')}
-
-  const state = nonce();
-
-  const installShopUrl = buildInstallUrl(shop, state, buildRedirectUri())
-
-  res.cookie('state', state) // should be encrypted in production
-  res.redirect(installShopUrl);
-});
-
-app.get('/shopify/callback', async (req, res) => {
-  const { shop, code, state } = req.query;
-  const stateCookie = cookie.parse(req.headers.cookie).state;
-
-  if (state !== stateCookie) { return res.status(403).send('Cannot be verified')}
-
-  const { hmac, ...params } = req.query
-  const queryParams = querystring.stringify(params)
-  const hash = generateEncryptedHash(queryParams)
-
-  if (hash !== hmac) { return res.status(400).send('HMAC validation failed')}
-
-  try {
-    const data = {
-      client_id: shopifyApiPublicKey,
-      client_secret: shopifyApiSecretKey,
-      code
-    };
-    const tokenResponse = await fetchAccessToken(shop, data)
-
-    const { access_token } = tokenResponse.data
-
-    // const shopData = await fetchShopData(shop, access_token)
-    const productData = await fetchProducts(shop, access_token)
-    // const saveData = JSON.parse(shopData.data.shop)
-    // console.log(saveData)
-    res.send(productData.data)
-
-  } catch(err) {
-    console.log(err)
-    res.status(500).send('something went wrong')
-  }
-});
-
-///////////// Start the Server /////////////
+app.use('/',ProductRoute)
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));
