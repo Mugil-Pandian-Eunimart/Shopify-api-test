@@ -36,6 +36,7 @@ router.route('/shopify/callback').get( async (req, res) => {
       };
       const tokenResponse = await Product.fetchAccessToken(shop, data)
       const { access_token } = tokenResponse.data
+      process.env.SHOPIFY_ACCESS_TOKEN = access_token
       // const shopData = await fetchShopData(shop, access_token)
     //   const addProductData = await Product.addProduct(shop, access_token)
       const productData = await Product.fetchProducts(shop, access_token)
@@ -45,5 +46,17 @@ router.route('/shopify/callback').get( async (req, res) => {
       res.status(500).send('something went wrong')
     }
 });
+
+router.route('/products').get( async (req,res) => {
+    try{
+        const shop = req.query.shop;
+        const shopData = await Product.fetchShopData(shop, process.env.SHOPIFY_ACCESS_TOKEN)
+        res.send(shopData.data)
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).send('something went wrong')
+    }
+})
 
 module.exports = router;
