@@ -5,6 +5,8 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 var router = express.Router();
+const app = express();
+router.use(express.json());
 
 const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
 const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
@@ -72,7 +74,9 @@ router.route('/products').get( async (req,res) => {
 .post(async (req,res) => {
     try {
         const shop = req.query.shop;
-        const addProductData = await Product.addProduct(shop, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log(req.body)
+        const data = req.body;
+        const addProductData = await Product.addProduct(shop,data, process.env.SHOPIFY_ACCESS_TOKEN)
         console.log("Added Product")
         res.status(200).send({"data":"Product added Successfully"})
     } catch (err) {
@@ -84,7 +88,8 @@ router.route('/products').get( async (req,res) => {
     try{
         const shop = req.query.shop;
         const productId = req.query.id;
-        const updateProductData = await Product.updateProduct(shop, productId, process.env.SHOPIFY_ACCESS_TOKEN)
+        const data = req.body;
+        const updateProductData = await Product.updateProduct(shop, productId,data, process.env.SHOPIFY_ACCESS_TOKEN)
         console.log("Updated Product for id : "+productId)
         res.status(200).send({"data":"Product updated Successfully"})
     } catch(err) {
