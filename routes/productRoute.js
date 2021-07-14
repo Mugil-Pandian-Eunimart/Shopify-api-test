@@ -92,5 +92,17 @@ router.route('/products').get( async (req,res) => {
         res.status(500).send("Error: "+err)
     }
 })
+.delete(async (req,res) => {
+    try{
+        const shop = req.query.shop;
+        const productId = req.query.id;
+        const deleteProductData = await Product.deleteProduct(shop, productId, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log("Deleted Product for id : "+productId)
+        res.status(200).send({"data":"Product deleted Successfully"})
+    }catch(err) {
+        console.log(err)
+        res.status(500).send("Error: "+err)
+    }
+})
 
 module.exports = router;

@@ -95,7 +95,14 @@ class Product {
                 "title": "New product title"
             }
         }
-    })
+    });
+
+    deleteProduct = async (shop, productId, accessToken) => await axios(this.buildProductUpdateRequestUrl(shop,productId), {
+        method:'DELETE',
+        headers: {
+            'X-Shopify-Access-Token': accessToken
+        }
+    });
 }
 
 module.exports = new Product();
