@@ -6,9 +6,7 @@ const app = express();
 const PORT = 8080
 
 // << db setup >>
-const db = require("./utils/database");
-const dbName = "ProductDatabase";
-const collectionName = "Products";
+const mongoose = require("./utils/database");
 
 app.use('/',ProductRoute)
 app.listen(PORT, () => console.log(`listening on port ${PORT}`));

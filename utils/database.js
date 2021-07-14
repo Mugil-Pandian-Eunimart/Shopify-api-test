@@ -1,27 +1,11 @@
-const MongoClient = require("mongodb").MongoClient;
+const mongoose = require('mongoose');
 
 const dbConnectionUrl = "mongodb+srv://root:root@maincluster.vghnr.mongodb.net/ProductDatabase?retryWrites=true&w=majority";
 
-function initialize(
-    dbName,
-    dbCollectionName,
-    successCallback,
-    failureCallback
-) {
-    MongoClient.connect(dbConnectionUrl, function(err, dbInstance) {
-        if (err) {
-            console.log(`[MongoDB connection] ERROR: ${err}`);
-            failureCallback(err); // this should be "caught" by the calling function
-        } else {
-            const dbObject = dbInstance.db(dbName);
-            const dbCollection = dbObject.collection(dbCollectionName);
-            console.log("[MongoDB connection] SUCCESS");
+mongoose.connect(dbConnectionUrl);
 
-            successCallback(dbCollection);
-        }
-    });
-}
+var db = mongoose.connection;
 
-module.exports = {
-    initialize
-};
+db.on('error', console.error.bind(console, 'connection error:'));
+
+module.exports =db;

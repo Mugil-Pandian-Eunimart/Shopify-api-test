@@ -5,7 +5,10 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 var router = express.Router();
-const app = express();
+let mongoose = require('mongoose');
+const db = require('../utils/database')
+const productModel = require('../models/productModel')
+const accessModel = require('../models/accessModel')
 router.use(express.json());
 
 const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
@@ -39,6 +42,19 @@ router.route('/shopify/callback').get( async (req, res) => {
         const tokenResponse = await Product.fetchAccessToken(shop, data)
         const { access_token } = tokenResponse.data
         process.env.SHOPIFY_ACCESS_TOKEN = access_token
+        
+            console.log("Connection Successful!");
+            let acc = new accessModel({
+                AccessToken : access_token
+            });
+
+            acc.save(function(err,data){
+                if (err) 
+                    throw err;
+                return console.log("Access stored")
+            })
+
+
         res.status(200).send({"data":"Access token created "})
     } catch(err) {
         console.log(err)
