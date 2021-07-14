@@ -13,7 +13,7 @@ const appUrl = 'http://0794979b92c9.ngrok.io';
 
 router.route('/shopify').get( async (req, res) => {
     const shop = req.query.shop;
-    if (!shop) { return res.status(400).send('no shop')}
+    if (!shop) { return res.status(400).send({"Error":"Enter shop name as a query param"})}
     const state = nonce();
     const installShopUrl = Product.buildInstallUrl(shop, state, Product.buildRedirectUri())
     res.cookie('state', state)
@@ -37,13 +37,25 @@ router.route('/shopify/callback').get( async (req, res) => {
         const tokenResponse = await Product.fetchAccessToken(shop, data)
         const { access_token } = tokenResponse.data
         process.env.SHOPIFY_ACCESS_TOKEN = access_token
-        const shopData = await Product.fetchShopData(shop, access_token)
-        res.send(shopData.data)
+        res.status(200).send({"data":"Access token created "})
     } catch(err) {
         console.log(err)
         res.status(500).send("Error: "+err)
     }
 });
+
+router.route('/shop').get( async (req,res) => {
+    try{
+        const shop = req.query.shop;
+        const shopData = await Product.fetchShopData(shop, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log("Fetched Shop Information")
+        res.send(shopData.data)
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).send("Error: "+err)
+    }
+})
 
 router.route('/products').get( async (req,res) => {
     try{
@@ -63,11 +75,22 @@ router.route('/products').get( async (req,res) => {
         const addProductData = await Product.addProduct(shop, process.env.SHOPIFY_ACCESS_TOKEN)
         console.log("Added Product")
         res.status(200).send({"data":"Product added Successfully"})
-        res.send(shopData.data)
     } catch (err) {
         console.log(err)
         res.status(500).send("Error: "+err)
     }
-});
+})
+.put(async (req,res) => {
+    try{
+        const shop = req.query.shop;
+        const productId = req.query.id;
+        const updateProductData = await Product.updateProduct(shop, productId, process.env.SHOPIFY_ACCESS_TOKEN)
+        console.log("Updated Product for id : "+productId)
+        res.status(200).send({"data":"Product updated Successfully"})
+    } catch(err) {
+        console.log(err)
+        res.status(500).send("Error: "+err)
+    }
+})
 
 module.exports = router;

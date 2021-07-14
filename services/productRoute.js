@@ -35,7 +35,11 @@ class Product {
     buildProductAddRequestUrl(shop){
         return `https://${shop}/admin/api/2021-07/products.json`
     }
-        
+    
+    buildProductUpdateRequestUrl(shop,productId){
+        return `https://${shop}/admin/api/2021-07/products/${productId}.json`
+    }
+
     generateEncryptedHash(params){
         return crypto.createHmac('sha256', this.shopifyApiSecretKey).update(params).digest('hex');
     }
@@ -79,6 +83,19 @@ class Product {
               }
         }
     });
+
+    updateProduct = async (shop, productId, accessToken) => await axios(this.buildProductUpdateRequestUrl(shop,productId), {
+        method:'PUT',
+        headers: {
+            'X-Shopify-Access-Token': accessToken
+        },
+        data: {
+            "product": {
+                "id": productId,
+                "title": "New product title"
+            }
+        }
+    })
 }
 
 module.exports = new Product();
