@@ -4,4 +4,6 @@ var productModel = mongoose.Schema({
     product:{type:JSON,require:true}
 })
 
-module.exports = productModel = mongoose.model('Products',productModel);
+var productModel = mongoose.model('productModel',productModel,'Products');
+
+module.exports = productModel;

@@ -44,15 +44,15 @@ router.route('/shopify/callback').get( async (req, res) => {
         process.env.SHOPIFY_ACCESS_TOKEN = access_token
         
             console.log("Connection Successful!");
-            let acc = new accessModel({
-                AccessToken : access_token
-            });
+            // let acc = new accessModel({
+            //     AccessToken : access_token
+            // });
 
-            acc.save(function(err,data){
-                if (err) 
-                    throw err;
-                return console.log("Access stored")
-            })
+            // acc.save(function(err,data){
+            //     if (err) 
+            //         throw err;
+            //     return console.log("Access stored")
+            // })
 
 
         res.status(200).send({"data":"Access token created "})
