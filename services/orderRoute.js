@@ -3,7 +3,7 @@ const axios = require('axios');
 class Order {
 
     constructor(appUrl) {
-        this.appUrl = 'https://0794979b92c9.ngrok.io';
+        this.appUrl = 'https://cba19034d359.ngrok.io';
     }
 
     buildOrderDataRequestUrl(shop) {
@@ -22,35 +22,35 @@ class Order {
         return `https://${shop}/admin/api/2021-07/orders/${id}.json`
     }
 
-    fetchOrders = async (shop,accessToken) => await axios(this.buildOrderDataRequestUrl(shop), {
+    async fetchOrders (shop,accessToken) {return await axios(this.buildOrderDataRequestUrl(shop), {
         method: 'GET',
         headers: {
             'X-Shopify-Access-Token': accessToken
         }
-    });
+    });}
 
-    createOrder = async (shop,data,accessToken) => await axios(this.buildCreateOrderRequestUrl(shop), {
+    async createOrder (shop,data,accessToken) {return await axios(this.buildCreateOrderRequestUrl(shop), {
         method: 'POST',
         headers: {
             'X-Shopify-Access-Token': accessToken
         },
         data
-    });
+    });}
 
-    updateOrder = async (shop,data,id,accessToken) => await axios(this.buildUpdateOrderRequestUrl(shop,id), {
+    async updateOrder (shop,data,id,accessToken) {return await axios(this.buildUpdateOrderRequestUrl(shop,id), {
         method: 'PUT',
         headers: {
             'X-Shopify-Access-Token': accessToken
         },
         data
-    });
+    });}
 
-    deleteOrder = async (shop,id,accessToken) => await axios(this.buildDeleteOrderRequestUrl(shop,id), {
+    async deleteOrder (shop,id,accessToken) {return await axios(this.buildDeleteOrderRequestUrl(shop,id), {
         method: 'DELETE',
         headers: {
             'X-Shopify-Access-Token': accessToken
         }
-    });
+    });}
 }
 
 module.exports = new Order();

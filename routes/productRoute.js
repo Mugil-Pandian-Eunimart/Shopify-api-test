@@ -5,16 +5,13 @@ const cookie = require('cookie');
 const nonce = require('nonce')();
 const querystring = require('querystring');
 var router = express.Router();
-let mongoose = require('mongoose');
-const db = require('../utils/database')
-const productModel = require('../models/productModel')
-const accessModel = require('../models/accessModel')
+const MongoClient = require('mongodb').MongoClient;
 router.use(express.json());
 
 const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
 const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
 const scopes = "read_products, write_products,read_product_listings,read_customers, write_customers,read_orders, write_orders";
-const appUrl = 'http://0794979b92c9.ngrok.io';
+const appUrl = 'https://cba19034d359.ngrok.io';
 
 router.route('/shopify').get( async (req, res) => {
     const shop = req.query.shop;
@@ -42,19 +39,21 @@ router.route('/shopify/callback').get( async (req, res) => {
         const tokenResponse = await Product.fetchAccessToken(shop, data)
         const { access_token } = tokenResponse.data
         process.env.SHOPIFY_ACCESS_TOKEN = access_token
-        
-            console.log("Connection Successful!");
-            // let acc = new accessModel({
-            //     AccessToken : access_token
-            // });
-
-            // acc.save(function(err,data){
-            //     if (err) 
-            //         throw err;
-            //     return console.log("Access stored")
-            // })
-
-
+        console.log("Connection Successful!");
+        MongoClient.connect(process.env.MONGODB_URI,function (err,db){
+            if (err) throw err;
+            var dbo = db.db("ProductDatabase")
+            dbo.collection("Access").deleteMany({AccessToken:/^s/},function(err,res){
+                if (err) throw err;
+            });
+            dbo.collection("Access").insertOne({
+                AccessToken:access_token
+            },function(err,res){
+                if (err) throw err;
+                console.log("Values Inserted");
+                db.close();
+            })
+        })
         res.status(200).send({"data":"Access token created "})
     } catch(err) {
         console.log(err)
@@ -62,24 +61,25 @@ router.route('/shopify/callback').get( async (req, res) => {
     }
 });
 
-router.route('/shop').get( async (req,res) => {
-    try{
-        const shop = req.query.shop;
-        const shopData = await Product.fetchShopData(shop, process.env.SHOPIFY_ACCESS_TOKEN)
-        console.log("Fetched Shop Information")
-        res.send(shopData.data)
-    }
-    catch(err) {
-        console.log(err)
-        res.status(500).send("Error: "+err)
-    }
-})
-
 router.route('/products').get( async (req,res) => {
     try{
         const shop = req.query.shop;
         const productData = await Product.fetchProducts(shop, process.env.SHOPIFY_ACCESS_TOKEN)
         console.log("Fetched all Products")
+        MongoClient.connect(process.env.MONGODB_URI,function (err,db){
+            if (err) throw err;
+            var dbo = db.db("ProductDatabase")
+            dbo.collection("Products").deleteMany({},function(err,res){
+                if (err) throw err;
+            });
+            dbo.collection("Products").insertOne(
+                productData.data
+            ,function(err,res){
+                if (err) throw err;
+                console.log("Values Inserted");
+                db.close();
+            })
+        })
         res.send(productData.data)
     }
     catch(err) {

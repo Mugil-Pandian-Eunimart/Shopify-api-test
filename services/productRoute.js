@@ -5,7 +5,7 @@ class Product {
 
     constructor(scopes,appUrl,shopifyApiPublicKey,shopifyApiSecretKey) {
         this.scopes = "read_products, write_products,read_product_listings,read_customers, write_customers,read_orders, write_orders";
-        this.appUrl = 'https://0794979b92c9.ngrok.io';
+        this.appUrl = 'https://cba19034d359.ngrok.io';
         this.shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
         this.shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
     }
@@ -44,27 +44,27 @@ class Product {
         return crypto.createHmac('sha256', this.shopifyApiSecretKey).update(params).digest('hex');
     }
 
-    fetchAccessToken = async (shop, data) => await axios(this.buildAccessTokenRequestUrl(shop), {
+    async fetchAccessToken (shop, data) {return await axios(this.buildAccessTokenRequestUrl(shop), {
         method: 'POST',
         data
-    });
+    });}
 
-    fetchShopData = async (shop, accessToken) => await axios(this.buildShopDataRequestUrl(shop), {
+    async fetchShopData (shop, accessToken) {return await axios(this.buildShopDataRequestUrl(shop), {
         method: 'GET',
         headers: {
             'X-Shopify-Access-Token': accessToken
         }
-    });
+    });}
 
-    fetchProducts = async (shop, accessToken) => await axios(this.buildProductDataRequestUrl(shop), {
+    async fetchProducts (shop, accessToken) {return await axios(this.buildProductDataRequestUrl(shop), {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json' ,
             'X-Shopify-Access-Token': accessToken
         }
-    });
+    });}
 
-    addProduct = async (shop,data,accessToken) => await axios(this.buildProductAddRequestUrl(shop), {
+    async addProduct (shop,data,accessToken) {return await axios(this.buildProductAddRequestUrl(shop), {
         method: 'POST',
         headers: {
             'X-Shopify-Access-Token': accessToken
@@ -73,9 +73,9 @@ class Product {
             product:data
         }
 
-    });
+    });}
 
-    updateProduct = async (shop, productId,data, accessToken) => await axios(this.buildProductUpdateRequestUrl(shop,productId), {
+    async updateProduct (shop, productId,data, accessToken) {return await axios(this.buildProductUpdateRequestUrl(shop,productId), {
         method:'PUT',
         headers: {
             'X-Shopify-Access-Token': accessToken
@@ -83,14 +83,14 @@ class Product {
         data:{
             product:data
         }
-    });
+    });}
 
-    deleteProduct = async (shop, productId, accessToken) => await axios(this.buildProductUpdateRequestUrl(shop,productId), {
+    async deleteProduct (shop, productId, accessToken) {return await axios(this.buildProductUpdateRequestUrl(shop,productId), {
         method:'DELETE',
         headers: {
             'X-Shopify-Access-Token': accessToken
         }
-    });
+    });}
 }
 
 module.exports = new Product();
