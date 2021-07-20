@@ -5,7 +5,7 @@ class Product {
 
     constructor(scopes,appUrl,shopifyApiPublicKey,shopifyApiSecretKey) {
         this.scopes = "read_products, write_products,read_product_listings,read_customers, write_customers,read_orders, write_orders";
-        this.appUrl = 'https://cba19034d359.ngrok.io';
+        this.appUrl = 'https://ee6e4559d822.ngrok.io';
         this.shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
         this.shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
     }

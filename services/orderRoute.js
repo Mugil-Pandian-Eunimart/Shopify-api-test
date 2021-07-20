@@ -3,7 +3,7 @@ const axios = require('axios');
 class Order {
 
     constructor(appUrl) {
-        this.appUrl = 'https://cba19034d359.ngrok.io';
+        this.appUrl = 'https://ee6e4559d822.ngrok.io';
     }
 
     buildOrderDataRequestUrl(shop) {

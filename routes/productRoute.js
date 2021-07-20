@@ -11,7 +11,7 @@ router.use(express.json());
 const shopifyApiPublicKey = process.env.SHOPIFY_API_PUBLIC_KEY;
 const shopifyApiSecretKey = process.env.SHOPIFY_API_SECRET_KEY;
 const scopes = "read_products, write_products,read_product_listings,read_customers, write_customers,read_orders, write_orders";
-const appUrl = 'https://cba19034d359.ngrok.io';
+const appUrl = 'https://ee6e4559d822.ngrok.io';
 
 router.route('/shopify').get( async (req, res) => {
     const shop = req.query.shop;
